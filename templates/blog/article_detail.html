@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ article.title }}</title>
+</head>
+<body>
+    <a href="{% url 'article_list' %}">Назад к списку</a>
+    <h1>{{ article.title }}</h1>
+    <p><small>Автор: {{ article.author.username }} | Дата: {{ article.date|date:"d.m.Y H:i" }}</small></p>
+
+    {% if user == article.author %}
+        <a href="{% url 'article_edit' article.pk %}">Редактировать</a> |
+        <a href="{% url 'article_delete' article.pk %}">Удалить</a>
+    {% endif %}
+
+    <div>
+        <p>{{ article.text }}</p>
+    </div>
+
+    <hr>
+    <h3>Комментарии:</h3>
+    {% for comment in comments %}
+        <div>
+            <strong>{{ comment.author.username }}</strong> <small>({{ comment.date|date:"d.m.Y H:i" }})</small>
+            <p>{{ comment.text }}</p>
+        </div>
+    {% empty %}
+        <p>Комментариев пока нет.</p>
+    {% endfor %}
+
+    {% if user.is_authenticated %}
+        <h4>Оставить комментарий:</h4>
+        <form method="post">
+            {% csrf_token %}
+            {{ comment_form.as_p }}
+            <button type="submit">Отправить</button>
+        </form>
+    {% else %}
+        <p><a href="{% url 'login' %}">Войдите</a>, чтобы оставить комментарий.</p>
+    {% endif %}
+</body>
+</html>
